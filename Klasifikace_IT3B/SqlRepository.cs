@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Data.SqlClient;
-
+using System.Linq;
 
 namespace Klasifikace_IT3B
 {
@@ -16,6 +16,12 @@ namespace Klasifikace_IT3B
                                       TrustServerCertificate=False;
                                       ApplicationIntent=ReadWrite;
                                       MultiSubnetFailover=False";
+        private Dictionary<int,Teacher> teachers;
+
+        public SqlRepository()
+        {
+            teachers = GetTeachersFromDB();
+        }
 
         private List<Student> TempStudents()
         {
@@ -78,6 +84,70 @@ namespace Klasifikace_IT3B
 
             //return TempStudents();
             return students;
+        }
+
+        public List<Grade> GetGrades(Student student)
+        {
+            List<Grade> grades = new List<Grade>();
+            using(SqlConnection sqlConnection = new SqlConnection(connString))
+            {
+                using(SqlCommand sqlCommand = new SqlCommand("", sqlConnection))
+                {
+                    sqlCommand.CommandText = "";
+                }
+            }
+            return grades;
+        }
+
+        private Dictionary<int,Teacher> GetTeachersFromDB()
+        {
+            Dictionary<int, Teacher> teachers = new Dictionary<int, Teacher>();
+            try
+            {
+                using (SqlConnection sqlConnection = new SqlConnection(connString))
+                {
+                    sqlConnection.Open();
+                    using (SqlCommand sqlCommand = new SqlCommand())
+                    {
+                        sqlCommand.Connection = sqlConnection;
+                        sqlCommand.CommandText = "select * from Teacher";
+                        using (SqlDataReader sqlDataReader = sqlCommand.ExecuteReader())
+                        {
+                            while (sqlDataReader.Read())
+                            {
+                                var id = Convert.ToInt32(sqlDataReader["IdTeacher"]);
+                                teachers.Add(id, new Teacher()
+                                {
+                                    Id = id,
+                                    Name = sqlDataReader["Name"].ToString(),
+                                    ShortName = sqlDataReader["ShortName"].ToString()                                    
+                                });
+                            }
+                        }
+                    }
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Some error happend (Exception: {ex.Message})");
+            }
+
+            return teachers;
+        }
+
+        public List<Teacher> GetTeachers()
+        {
+            return teachers.Values.AsEnumerable().ToList();
+        }
+
+        public Teacher GetTeacher(int id)
+        {
+            if (teachers.ContainsKey(id))
+            {
+                return teachers[id];
+            }
+            return null;
         }
     }
 }
