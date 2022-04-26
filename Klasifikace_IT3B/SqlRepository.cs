@@ -17,10 +17,12 @@ namespace Klasifikace_IT3B
                                       ApplicationIntent=ReadWrite;
                                       MultiSubnetFailover=False";
         private Dictionary<int,Teacher> teachers;
+        private Dictionary<int, Subject> subjects;
 
         public SqlRepository()
         {
             teachers = GetTeachersFromDB();
+            subjects = GetSubjectsFromDB();
         }
 
         private List<Student> TempStudents()
@@ -146,6 +148,58 @@ namespace Klasifikace_IT3B
             if (teachers.ContainsKey(id))
             {
                 return teachers[id];
+            }
+            return null;
+        }
+
+        private Dictionary<int, Subject> GetSubjectsFromDB()
+        {
+            Dictionary<int, Subject> subjects = new Dictionary<int, Subject>();
+            try
+            {
+                using (SqlConnection sqlConnection = new SqlConnection(connString))
+                {
+                    sqlConnection.Open();
+                    using (SqlCommand sqlCommand = new SqlCommand())
+                    {
+                        sqlCommand.Connection = sqlConnection;
+                        sqlCommand.CommandText = "select * from Subject";
+                        using (SqlDataReader sqlDataReader = sqlCommand.ExecuteReader())
+                        {
+                            while (sqlDataReader.Read())
+                            {
+                                var id = Convert.ToInt32(sqlDataReader["IdSubject"]);
+                                subjects.Add(id, new Subject()
+                                {
+                                    Id = id,
+                                    Name = sqlDataReader["Name"].ToString(),
+                                    ShortName = sqlDataReader["ShortName"].ToString(),
+                                    Teacher = GetTeacher(Convert.ToInt32(sqlDataReader["IdTeacher"]))
+                                }); 
+                            }
+                        }
+                    }
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Some error happend (Exception: {ex.Message})");
+            }
+
+            return subjects;
+        }
+
+        public List<Subject> GetSubjects()
+        {
+            return subjects.Values.AsEnumerable().ToList();
+        }
+
+        public Subject GetSubject(int id)
+        {
+            if (subjects.ContainsKey(id))
+            {
+                return subjects[id];
             }
             return null;
         }
