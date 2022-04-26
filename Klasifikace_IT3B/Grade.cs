@@ -11,5 +11,10 @@ namespace Klasifikace_IT3B
         public Subject Subject { get; set; }
         public double Weight { get; set; }
         public string Comment { get; set; }
+
+        public override string ToString()
+        {
+            return GradeNumber.ToString();
+        }
     }
 }

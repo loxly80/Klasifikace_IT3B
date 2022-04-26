@@ -16,7 +16,7 @@ namespace Klasifikace_IT3B
                                       TrustServerCertificate=False;
                                       ApplicationIntent=ReadWrite;
                                       MultiSubnetFailover=False";
-        private Dictionary<int,Teacher> teachers;
+        private Dictionary<int, Teacher> teachers;
         private Dictionary<int, Subject> subjects;
 
         public SqlRepository()
@@ -65,24 +65,26 @@ namespace Klasifikace_IT3B
                         {
                             while (sqlDataReader.Read())
                             {
-                                students.Add(new Student()
+                                var student = new Student()
                                 {
                                     Id = Convert.ToInt32(sqlDataReader["IdStudent"]),
                                     Firstname = sqlDataReader["Firstname"].ToString(),
                                     Lastname = sqlDataReader["Lastname"].ToString(),
                                     Birthday = Convert.ToDateTime(sqlDataReader["Birthday"])
-                                });
+                                };
+                                student.Grades = GetGrades(student);
+                                students.Add(student);
                             }
                         }
                     }
                     sqlConnection.Close();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception($"Some error happend (Exception: {ex.Message})");
             }
-            
+
 
             //return TempStudents();
             return students;
@@ -91,17 +93,34 @@ namespace Klasifikace_IT3B
         public List<Grade> GetGrades(Student student)
         {
             List<Grade> grades = new List<Grade>();
-            using(SqlConnection sqlConnection = new SqlConnection(connString))
+            using (SqlConnection sqlConnection = new SqlConnection(connString))
             {
-                using(SqlCommand sqlCommand = new SqlCommand("", sqlConnection))
+                sqlConnection.Open();
+                using (SqlCommand sqlCommand = new SqlCommand())
                 {
-                    sqlCommand.CommandText = "";
+                    sqlCommand.Connection = sqlConnection;
+                    sqlCommand.CommandText = $"select * from Grade where IdStudent={student.Id}";
+                    using (SqlDataReader sqlDataReader = sqlCommand.ExecuteReader())
+                    {
+                        while (sqlDataReader.Read())
+                        {
+                            grades.Add(new Grade()
+                            {
+                                Id = Convert.ToInt32(sqlDataReader["IdGrade"]),
+                                GradeNumber = Convert.ToInt32(sqlDataReader["GradeNumber"]),
+                                Weight = Convert.ToDouble(sqlDataReader["Weight"]),
+                                Comment = sqlDataReader["IdSubject"].ToString(),
+                                Subject = GetSubject(Convert.ToInt32(sqlDataReader["IdSubject"]))
+                            });
+                        }
+                    }
                 }
+                sqlConnection.Close();
             }
             return grades;
         }
 
-        private Dictionary<int,Teacher> GetTeachersFromDB()
+        private Dictionary<int, Teacher> GetTeachersFromDB()
         {
             Dictionary<int, Teacher> teachers = new Dictionary<int, Teacher>();
             try
@@ -122,7 +141,7 @@ namespace Klasifikace_IT3B
                                 {
                                     Id = id,
                                     Name = sqlDataReader["Name"].ToString(),
-                                    ShortName = sqlDataReader["ShortName"].ToString()                                    
+                                    ShortName = sqlDataReader["ShortName"].ToString()
                                 });
                             }
                         }
@@ -175,7 +194,7 @@ namespace Klasifikace_IT3B
                                     Name = sqlDataReader["Name"].ToString(),
                                     ShortName = sqlDataReader["ShortName"].ToString(),
                                     Teacher = GetTeacher(Convert.ToInt32(sqlDataReader["IdTeacher"]))
-                                }); 
+                                });
                             }
                         }
                     }
