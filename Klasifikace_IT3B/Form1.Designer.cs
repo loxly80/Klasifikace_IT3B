@@ -35,6 +35,9 @@
             this.columnHeader4 = new System.Windows.Forms.ColumnHeader();
             this.columnHeader5 = new System.Windows.Forms.ColumnHeader();
             this.columnHeader6 = new System.Windows.Forms.ColumnHeader();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.btnAddStudent = new System.Windows.Forms.Button();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // lvData
@@ -47,14 +50,15 @@
             this.columnHeader5,
             this.columnHeader6});
             this.lvData.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lvData.FullRowSelect = true;
             this.lvData.GridLines = true;
-            this.lvData.HideSelection = false;
-            this.lvData.Location = new System.Drawing.Point(0, 0);
+            this.lvData.Location = new System.Drawing.Point(0, 42);
             this.lvData.Name = "lvData";
-            this.lvData.Size = new System.Drawing.Size(800, 450);
+            this.lvData.Size = new System.Drawing.Size(800, 408);
             this.lvData.TabIndex = 0;
             this.lvData.UseCompatibleStateImageBehavior = false;
             this.lvData.View = System.Windows.Forms.View.Details;
+            this.lvData.DoubleClick += new System.EventHandler(this.lvData_DoubleClick);
             // 
             // columnHeader1
             // 
@@ -80,14 +84,35 @@
             // 
             this.columnHeader6.Text = "Grafika";
             // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.btnAddStudent);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(800, 42);
+            this.panel1.TabIndex = 1;
+            // 
+            // btnAddStudent
+            // 
+            this.btnAddStudent.Location = new System.Drawing.Point(3, 3);
+            this.btnAddStudent.Name = "btnAddStudent";
+            this.btnAddStudent.Size = new System.Drawing.Size(143, 34);
+            this.btnAddStudent.TabIndex = 0;
+            this.btnAddStudent.Text = "Přidat studenta";
+            this.btnAddStudent.UseVisualStyleBackColor = true;
+            this.btnAddStudent.Click += new System.EventHandler(this.btnAddStudent_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.lvData);
+            this.Controls.Add(this.panel1);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -101,6 +126,8 @@
         private System.Windows.Forms.ColumnHeader columnHeader4;
         private System.Windows.Forms.ColumnHeader columnHeader5;
         private System.Windows.Forms.ColumnHeader columnHeader6;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Button btnAddStudent;
     }
 }
 
